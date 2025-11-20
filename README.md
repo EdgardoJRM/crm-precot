@@ -1,36 +1,147 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# PrecoTracks CRM
 
-## Getting Started
+Sistema CRM interno para gestión de participantes y campañas de email.
 
-First, run the development server:
+## Características
+
+- 🔐 Autenticación por magic link (solo emails whitelist)
+- 📊 Importación de participantes desde CSV
+- 🔍 Búsqueda y filtrado de participantes
+- 📧 Creación y envío de campañas de email vía AWS SES
+- 📱 Diseño responsive y mobile-friendly
+
+## Stack Tecnológico
+
+- **Frontend**: Next.js 14 (App Router) + TypeScript + Tailwind CSS
+- **Backend**: Next.js API Routes (preparado para Lambda)
+- **Base de Datos**: DynamoDB
+- **Email**: AWS SES
+- **Autenticación**: Magic Link + JWT en cookies httpOnly
+
+## Configuración
+
+### 1. Variables de Entorno
+
+Copia `.env.local.example` a `.env.local` y configura:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+AWS_REGION=us-east-1
+CRM_USERS_TABLE=CRM-Users
+CRM_PARTICIPANTS_TABLE=CRM-Participants
+CRM_CAMPAIGNS_TABLE=CRM-Campaigns
+SES_FROM_EMAIL=noreply@precotracks.org
+SES_REPLY_TO=noreply@precotracks.org
+NEXT_PUBLIC_APP_URL=https://crm.precotracks.org
+SESSION_SECRET=tu-secret-key-aqui
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 2. Crear Tablas DynamoDB
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Crea las siguientes tablas en DynamoDB:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+#### CRM-Users
+- Partition Key: `pk` (String)
+- Sort Key: `sk` (String)
 
-## Learn More
+#### CRM-Participants
+- Partition Key: `pk` (String)
+- Sort Key: `sk` (String)
 
-To learn more about Next.js, take a look at the following resources:
+#### CRM-Campaigns
+- Partition Key: `pk` (String)
+- Sort Key: `sk` (String)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### 3. Configurar Usuarios Whitelist
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Agrega usuarios autorizados a la tabla `CRM-Users`:
 
-## Deploy on Vercel
+```json
+{
+  "pk": "USER#admin@precotracks.org",
+  "sk": "META",
+  "email": "admin@precotracks.org",
+  "name": "Admin User",
+  "role": "admin",
+  "isActive": true,
+  "createdAt": "2025-01-01T00:00:00.000Z",
+  "updatedAt": "2025-01-01T00:00:00.000Z"
+}
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### 4. Configurar AWS SES
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Verifica el dominio `precotracks.org` en SES
+- Verifica el email `noreply@precotracks.org` o solicita salida de sandbox
+- Configura las credenciales de AWS en tu entorno
+
+## Instalación
+
+```bash
+npm install
+npm run dev
+```
+
+## Estructura del Proyecto
+
+```
+precot-crm/
+├── app/                    # Next.js App Router
+│   ├── api/               # API Routes
+│   │   ├── auth/         # Autenticación
+│   │   ├── participants/ # Participantes
+│   │   └── campaigns/    # Campañas
+│   ├── login/            # Página de login
+│   ├── dashboard/        # Dashboard principal
+│   ├── participants/     # Listado de participantes
+│   └── campaigns/        # Gestión de campañas
+├── lib/
+│   ├── aws/              # Clientes AWS (DynamoDB, SES)
+│   ├── auth/             # Lógica de autenticación
+│   ├── services/         # Servicios de negocio
+│   ├── models/           # Types TypeScript
+│   └── config.ts         # Configuración
+└── middleware.ts         # Middleware de protección de rutas
+```
+
+## Uso
+
+### 1. Login
+
+1. Ve a `/login`
+2. Ingresa tu email (debe estar en whitelist)
+3. Recibirás un magic link por email
+4. Haz clic en el enlace para acceder
+
+### 2. Importar Participantes
+
+1. Ve a `/participants/import`
+2. Sube un archivo CSV
+3. Mapea las columnas a los campos del sistema
+4. Haz clic en "Importar Ahora"
+
+### 3. Crear Campaña
+
+1. Ve a `/campaigns/new`
+2. Completa nombre, subject y cuerpo del email
+3. Selecciona destinatarios (todos, por tags, o IDs específicos)
+4. Haz clic en "Enviar Ahora"
+
+## Despliegue
+
+El proyecto está preparado para desplegarse en AWS Amplify:
+
+1. Conecta el repositorio a Amplify
+2. Configura las variables de entorno
+3. Amplify detectará Next.js automáticamente
+4. El build y deploy se harán automáticamente
+
+## Notas de Desarrollo
+
+- Todas las rutas excepto `/login` y `/auth/verify` están protegidas por middleware
+- Las sesiones duran 7 días
+- Los magic links expiran en 30 minutos
+- El envío de emails tiene throttling de 100ms entre envíos
+
+## Licencia
+
+Propietario - PrecoTracks
