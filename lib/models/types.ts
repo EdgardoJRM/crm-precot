@@ -74,6 +74,44 @@ export interface CampaignFilters {
   allParticipants?: boolean; // Send to everyone
 }
 
+// Email Sequence Step (part of a drip campaign)
+export interface EmailSequenceStep {
+  stepNumber: number; // 1, 2, 3, etc.
+  subject: string;
+  bodyHtml: string;
+  delayDays: number; // Days to wait after previous step (0 for first step)
+  delayHours?: number; // Optional hours in addition to days
+}
+
+// Email Sequence (drip campaign)
+export interface EmailSequence {
+  pk: string; // SEQUENCE#<id>
+  sk: string; // META
+  id: string; // UUID
+  name: string;
+  description?: string;
+  steps: EmailSequenceStep[];
+  filters?: CampaignFilters;
+  createdBy: string; // email
+  status: 'draft' | 'active' | 'paused' | 'completed';
+  createdAt: string;
+  updatedAt: string;
+}
+
+// Participant Sequence Progress (tracks where each participant is in a sequence)
+export interface ParticipantSequenceProgress {
+  pk: string; // SEQUENCE#<sequenceId>
+  sk: string; // PARTICIPANT#<participantId>
+  sequenceId: string;
+  participantId: string;
+  participantEmail: string;
+  currentStep: number; // Which step they're on (0 = not started, 1 = first step, etc.)
+  nextSendDate: string; // ISO date when next email should be sent
+  startedAt: string; // When they entered the sequence
+  completedAt?: string; // When they completed all steps
+  lastSentStep?: number; // Last step that was sent
+}
+
 // Session payload (stored in JWT cookie)
 export interface SessionPayload {
   email: string;

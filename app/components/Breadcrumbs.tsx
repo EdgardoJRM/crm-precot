@@ -19,6 +19,8 @@ const routeLabels: Record<string, string> = {
   '/participants/import': 'Importar Participantes',
   '/campaigns': 'Campañas',
   '/campaigns/new': 'Nueva Campaña',
+  '/sequences': 'Secuencias',
+  '/sequences/new': 'Nueva Secuencia',
 };
 
 export default function Breadcrumbs() {

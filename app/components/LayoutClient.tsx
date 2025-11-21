@@ -25,6 +25,7 @@ export default function LayoutClient({ children, session }: LayoutClientProps) {
     { name: 'Dashboard', href: '/dashboard' },
     { name: 'Participantes', href: '/participants' },
     { name: 'Campañas', href: '/campaigns' },
+    { name: 'Secuencias', href: '/sequences' },
   ];
 
   const handleLogout = async () => {
