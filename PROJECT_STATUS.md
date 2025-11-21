@@ -172,3 +172,4 @@ node scripts/init-user.mjs email@example.com "Nombre" admin
 npm run lint
 ```
 
+

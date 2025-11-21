@@ -213,3 +213,4 @@ export async function getAllParticipants(): Promise<Participant[]> {
   return (result.Items || []) as Participant[];
 }
 
+
