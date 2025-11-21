@@ -10,6 +10,17 @@ import { config } from '@/lib/config';
 
 export async function POST(request: NextRequest) {
   try {
+    // Log configuration for debugging (only in production)
+    if (process.env.NODE_ENV === 'production') {
+      console.log('Configuration check:', {
+        region: config.aws.region,
+        usersTable: config.dynamodb.usersTable,
+        fromEmail: config.ses.fromEmail,
+        appUrl: config.app.url,
+        hasSessionSecret: !!config.session.secret && config.session.secret !== 'change-me-in-production',
+      });
+    }
+
     const body = await request.json();
     const { email } = body;
 
@@ -107,12 +118,29 @@ export async function POST(request: NextRequest) {
     
     // Return more detailed error in development, generic in production
     const isDevelopment = process.env.NODE_ENV === 'development';
+    
+    // In production, log full error details but return generic message
+    // Check CloudWatch logs for full error details
+    const errorMessage = error.message || 'Error interno del servidor';
+    const errorName = error.name || 'Unknown';
+    
+    console.error('=== ERROR DETAILS ===');
+    console.error('Error name:', errorName);
+    console.error('Error message:', errorMessage);
+    console.error('Error code:', error.code);
+    console.error('Config at error:', {
+      region: config.aws.region,
+      usersTable: config.dynamodb.usersTable,
+      fromEmail: config.ses.fromEmail,
+    });
+    console.error('===================');
+    
     return NextResponse.json(
       { 
         success: false, 
         error: isDevelopment 
-          ? `Error: ${error.message || 'Error interno del servidor'} (${error.name || 'Unknown'})` 
-          : 'Error interno del servidor. Verifica la configuración de AWS.' 
+          ? `Error: ${errorMessage} (${errorName})` 
+          : 'Error interno del servidor. Verifica la configuración de AWS. Revisa CloudWatch Logs para más detalles.' 
       },
       { status: 500 }
     );
