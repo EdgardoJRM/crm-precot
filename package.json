@@ -11,6 +11,7 @@
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.936.0",
     "@aws-sdk/client-ses": "^3.936.0",
+    "@aws-sdk/credential-providers": "^3.936.0",
     "@aws-sdk/lib-dynamodb": "^3.936.0",
     "jose": "^6.1.2",
     "next": "16.0.3",

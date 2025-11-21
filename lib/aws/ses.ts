@@ -4,10 +4,12 @@
  */
 
 import { SESClient, SendEmailCommand } from '@aws-sdk/client-ses';
+import { fromNodeProviderChain } from '@aws-sdk/credential-providers';
 import { config } from '../config';
 
 const sesClient = new SESClient({
   region: config.aws.region,
+  credentials: fromNodeProviderChain(),
 });
 
 /**
