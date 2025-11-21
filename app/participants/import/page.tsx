@@ -88,7 +88,7 @@ export default function ImportPage() {
           <button
             type="button"
             onClick={() => router.back()}
-            className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+            className="p-2 text-gray-900 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
             title="Volver"
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -97,7 +97,7 @@ export default function ImportPage() {
           </button>
           <div>
             <h1 className="text-3xl font-bold text-gray-900">Importar Participantes</h1>
-            <p className="mt-2 text-sm text-gray-600">
+            <p className="mt-2 text-sm text-gray-900">
               Sube un archivo CSV para importar participantes a la base de datos
             </p>
           </div>
@@ -113,9 +113,9 @@ export default function ImportPage() {
               type="file"
               accept=".csv"
               onChange={handleFileSelect}
-              className="block w-full text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 transition-colors"
+              className="block w-full text-sm text-gray-900 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 transition-colors"
             />
-            <p className="mt-2 text-xs text-gray-600">
+            <p className="mt-2 text-xs text-gray-900">
               El archivo debe estar en formato CSV con columnas para email, nombre, apellido, etc.
             </p>
           </div>
@@ -126,7 +126,7 @@ export default function ImportPage() {
               <h2 className="text-lg font-semibold text-gray-900 mb-4">
                 Mapear Columnas del CSV
               </h2>
-              <p className="text-sm text-gray-600 mb-4">
+              <p className="text-sm text-gray-900 mb-4">
                 Selecciona qué columna del CSV corresponde a cada campo del participante
               </p>
               <div className="space-y-4">
@@ -187,7 +187,7 @@ export default function ImportPage() {
                       <tr key={i} className="hover:bg-gray-50">
                         {columns.map((col) => (
                           <td key={col} className="px-4 py-2 text-gray-900">
-                            {row[col] || <span className="text-gray-400">—</span>}
+                            {row[col] || <span className="text-gray-700">—</span>}
                           </td>
                         ))}
                       </tr>

@@ -92,7 +92,7 @@ export default function EmailPreview({
                 <button
                   type="button"
                   onClick={() => setIsOpen(false)}
-                  className="text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-lg p-1"
+                  className="text-gray-700 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-lg p-1"
                 >
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -132,13 +132,13 @@ export default function EmailPreview({
                 <div className="border border-gray-200 rounded-lg overflow-hidden">
                   {/* Email Header */}
                   <div className="bg-gray-50 px-4 py-3 border-b border-gray-200">
-                    <div className="text-sm text-gray-600">
+                    <div className="text-sm text-gray-900">
                       <strong className="text-gray-900">De:</strong> noreply@precotracks.org
                     </div>
-                    <div className="text-sm text-gray-600 mt-1">
+                    <div className="text-sm text-gray-900 mt-1">
                       <strong className="text-gray-900">Para:</strong> {sampleData.email}
                     </div>
-                    <div className="text-sm text-gray-600 mt-1">
+                    <div className="text-sm text-gray-900 mt-1">
                       <strong className="text-gray-900">Asunto:</strong> {previewSubject || '(sin asunto)'}
                     </div>
                   </div>
@@ -146,7 +146,7 @@ export default function EmailPreview({
                   {/* Email Body */}
                   <div
                     className="p-6 bg-white"
-                    dangerouslySetInnerHTML={{ __html: previewHtml || '<p class="text-gray-500 italic">No hay contenido</p>' }}
+                    dangerouslySetInnerHTML={{ __html: previewHtml || '<p class="text-gray-900 italic">No hay contenido</p>' }}
                   />
                 </div>
 
@@ -155,7 +155,7 @@ export default function EmailPreview({
                   <p className="text-xs font-medium text-gray-700 mb-2">
                     Datos de ejemplo usados:
                   </p>
-                  <div className="grid grid-cols-2 gap-2 text-xs text-gray-600">
+                  <div className="grid grid-cols-2 gap-2 text-xs text-gray-900">
                     {Object.entries(sampleData).map(([key, value]) => (
                       <div key={key}>
                         <span className="font-medium">{key}:</span> {value}

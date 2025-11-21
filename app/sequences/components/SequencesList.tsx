@@ -57,15 +57,15 @@ export default function SequencesList() {
       {loading ? (
         <div className="p-8 text-center">
           <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mb-2"></div>
-          <p className="text-gray-600">Cargando secuencias...</p>
+          <p className="text-gray-900">Cargando secuencias...</p>
         </div>
       ) : sequences.length === 0 ? (
         <div className="p-8 text-center">
-          <svg className="mx-auto h-12 w-12 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="mx-auto h-12 w-12 text-gray-700 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
           </svg>
           <p className="text-gray-900 font-medium mb-1">No hay secuencias</p>
-          <p className="text-sm text-gray-600 mb-4">
+          <p className="text-sm text-gray-900 mb-4">
             Crea tu primera secuencia de emails automatizada
           </p>
           <Link href="/sequences/new" className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium">
@@ -100,12 +100,12 @@ export default function SequencesList() {
                   <td className="px-6 py-4">
                     <div className="text-sm font-medium text-gray-900">{sequence.name}</div>
                     {sequence.description && (
-                      <div className="text-xs text-gray-500 mt-1">{sequence.description}</div>
+                      <div className="text-xs text-gray-900 mt-1">{sequence.description}</div>
                     )}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm text-gray-900">{sequence.steps.length} paso(s)</div>
-                    <div className="text-xs text-gray-500">
+                    <div className="text-xs text-gray-900">
                       Duración total: {sequence.steps.reduce((sum, s) => sum + s.delayDays, 0)} días
                     </div>
                   </td>

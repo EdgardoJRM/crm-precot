@@ -23,7 +23,7 @@ export default async function ParticipantsPage() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">Participantes</h1>
-            <p className="mt-2 text-sm text-gray-600">
+            <p className="mt-2 text-sm text-gray-900">
               Busca y gestiona todos los participantes registrados
             </p>
           </div>

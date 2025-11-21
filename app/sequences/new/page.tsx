@@ -149,7 +149,7 @@ function NewSequenceContent() {
           <button
             type="button"
             onClick={() => router.back()}
-            className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+            className="p-2 text-gray-900 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
             title="Volver"
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -158,7 +158,7 @@ function NewSequenceContent() {
           </button>
           <div>
             <h1 className="text-3xl font-bold text-gray-900">Nueva Secuencia de Emails</h1>
-            <p className="mt-2 text-sm text-gray-600">
+            <p className="mt-2 text-sm text-gray-900">
               Crea una secuencia automatizada de emails con delays configurables entre cada paso
             </p>
           </div>
@@ -241,7 +241,7 @@ function NewSequenceContent() {
                       </label>
                       <div className="grid grid-cols-2 gap-4">
                         <div>
-                          <label className="block text-xs text-gray-600 mb-1">Días</label>
+                          <label className="block text-xs text-gray-900 mb-1">Días</label>
                           <input
                             type="number"
                             min="0"
@@ -251,7 +251,7 @@ function NewSequenceContent() {
                           />
                         </div>
                         <div>
-                          <label className="block text-xs text-gray-600 mb-1">Horas</label>
+                          <label className="block text-xs text-gray-900 mb-1">Horas</label>
                           <input
                             type="number"
                             min="0"
@@ -262,7 +262,7 @@ function NewSequenceContent() {
                           />
                         </div>
                       </div>
-                      <p className="mt-2 text-xs text-gray-600">
+                      <p className="mt-2 text-xs text-gray-900">
                         Este email se enviará {step.delayDays} día(s) y {step.delayHours || 0} hora(s) después del paso anterior
                       </p>
                     </div>
@@ -329,7 +329,7 @@ function NewSequenceContent() {
                 />
                 <div>
                   <div className="font-medium text-gray-900">Todos los participantes</div>
-                  <div className="text-sm text-gray-600 mt-1">
+                  <div className="text-sm text-gray-900 mt-1">
                     La secuencia se iniciará para todos los participantes
                   </div>
                 </div>
@@ -346,7 +346,7 @@ function NewSequenceContent() {
                 />
                 <div className="flex-1">
                   <div className="font-medium text-gray-900">Por tags</div>
-                  <div className="text-sm text-gray-600 mt-1 mb-3">
+                  <div className="text-sm text-gray-900 mt-1 mb-3">
                     Solo participantes con ciertos tags
                   </div>
                   {recipientType === 'tags' && (
@@ -377,7 +377,7 @@ function NewSequenceContent() {
                 />
                 <div className="flex-1">
                   <div className="font-medium text-gray-900">Participantes específicos</div>
-                  <div className="text-sm text-gray-600 mt-1 mb-3">
+                  <div className="text-sm text-gray-900 mt-1 mb-3">
                     Solo participantes seleccionados manualmente
                   </div>
                   {recipientType === 'ids' && (
@@ -429,7 +429,7 @@ export default function NewSequencePage() {
       <LayoutClient>
         <div className="text-center py-12">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Cargando...</p>
+          <p className="text-gray-900">Cargando...</p>
         </div>
       </LayoutClient>
     }>

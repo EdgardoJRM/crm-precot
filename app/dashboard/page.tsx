@@ -11,11 +11,12 @@ import Layout from '@/app/components/Layout';
 async function getStats() {
   try {
     // Fetch real stats from API
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
     const [participantsRes, campaignsRes] = await Promise.all([
-      fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/participants`, {
+      fetch(`${baseUrl}/api/participants/count`, {
         cache: 'no-store',
       }).catch(() => null),
-      fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/campaigns`, {
+      fetch(`${baseUrl}/api/campaigns`, {
         cache: 'no-store',
       }).catch(() => null),
     ]);
@@ -51,8 +52,8 @@ export default async function DashboardPage() {
         {/* Header */}
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-          <p className="mt-2 text-sm text-gray-600">
-            Bienvenido de vuelta, <span className="font-medium text-gray-900">{session.name || session.email}</span>
+          <p className="mt-2 text-sm text-gray-900">
+            Bienvenido de vuelta, <span className="font-medium">{session.name || session.email}</span>
           </p>
         </div>
 
@@ -68,7 +69,7 @@ export default async function DashboardPage() {
                 </div>
               </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Total Participantes</p>
+                <p className="text-sm font-medium text-gray-900">Total Participantes</p>
                 <p className="text-2xl font-bold text-gray-900">{stats.totalParticipants}</p>
               </div>
             </div>
@@ -84,7 +85,7 @@ export default async function DashboardPage() {
                 </div>
               </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Campañas Totales</p>
+                <p className="text-sm font-medium text-gray-900">Campañas Totales</p>
                 <p className="text-2xl font-bold text-gray-900">{stats.totalCampaigns}</p>
               </div>
             </div>
@@ -100,7 +101,7 @@ export default async function DashboardPage() {
                 </div>
               </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Rol</p>
+                <p className="text-sm font-medium text-gray-900">Rol</p>
                 <p className="text-2xl font-bold text-gray-900 capitalize">{session.role}</p>
               </div>
             </div>
@@ -125,7 +126,7 @@ export default async function DashboardPage() {
                   Importar Participantes
                 </h3>
               </div>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-gray-900">
                 Sube un archivo CSV con participantes para agregarlos a la base de datos
               </p>
             </Link>
@@ -142,7 +143,7 @@ export default async function DashboardPage() {
                   Ver Participantes
                 </h3>
               </div>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-gray-900">
                 Busca, filtra y gestiona todos los participantes registrados
               </p>
             </Link>
@@ -159,7 +160,7 @@ export default async function DashboardPage() {
                   Crear Campaña
                 </h3>
               </div>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-gray-900">
                 Crea y envía una nueva campaña de email personalizada
               </p>
             </Link>

@@ -85,7 +85,7 @@ function SequenceDetailContent() {
       <LayoutClient>
         <div className="text-center py-12">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Cargando secuencia...</p>
+          <p className="text-gray-900">Cargando secuencia...</p>
         </div>
       </LayoutClient>
     );
@@ -133,7 +133,7 @@ function SequenceDetailContent() {
             <button
               type="button"
               onClick={() => router.back()}
-              className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+              className="p-2 text-gray-900 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
               title="Volver"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -143,7 +143,7 @@ function SequenceDetailContent() {
             <div>
               <h1 className="text-3xl font-bold text-gray-900">{sequence.name}</h1>
               {sequence.description && (
-                <p className="mt-2 text-sm text-gray-600">{sequence.description}</p>
+                <p className="mt-2 text-sm text-gray-900">{sequence.description}</p>
               )}
             </div>
           </div>
@@ -170,7 +170,7 @@ function SequenceDetailContent() {
                     <div>
                       <div className="font-medium text-gray-900">{step.subject}</div>
                       {index > 0 && (
-                        <div className="text-xs text-gray-600 mt-1">
+                        <div className="text-xs text-gray-900 mt-1">
                           Espera: {step.delayDays} día(s) {step.delayHours ? `y ${step.delayHours} hora(s)` : ''} después del paso anterior
                         </div>
                       )}
@@ -189,7 +189,7 @@ function SequenceDetailContent() {
             <h2 className="text-lg font-semibold text-gray-900 mb-4">
               Iniciar Secuencia
             </h2>
-            <p className="text-sm text-gray-600 mb-4">
+            <p className="text-sm text-gray-900 mb-4">
               Selecciona los participantes para los que quieres iniciar esta secuencia. El primer email se enviará inmediatamente.
             </p>
 
@@ -273,7 +273,7 @@ function SequenceDetailContent() {
         )}
 
         {/* Sequence Info */}
-        <div className="bg-gray-50 rounded-lg p-4 text-sm text-gray-600">
+        <div className="bg-gray-50 rounded-lg p-4 text-sm text-gray-900">
           <p><strong>Creada:</strong> {new Date(sequence.createdAt).toLocaleString('es-ES')}</p>
           <p><strong>Creada por:</strong> {sequence.createdBy}</p>
         </div>
@@ -288,7 +288,7 @@ export default function SequenceDetailPage() {
       <LayoutClient>
         <div className="text-center py-12">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Cargando...</p>
+          <p className="text-gray-900">Cargando...</p>
         </div>
       </LayoutClient>
     }>

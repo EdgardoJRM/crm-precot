@@ -56,7 +56,7 @@ export default function Breadcrumbs() {
           <li key={crumb.href} className="flex items-center">
             {index > 0 && (
               <svg
-                className="w-4 h-4 text-gray-400 mx-2"
+                className="w-4 h-4 text-gray-700 mx-2"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -74,7 +74,7 @@ export default function Breadcrumbs() {
             ) : (
               <Link
                 href={crumb.href}
-                className="text-gray-600 hover:text-gray-900 transition-colors"
+                className="text-gray-900 hover:text-gray-900 transition-colors"
               >
                 {crumb.label}
               </Link>

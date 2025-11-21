@@ -50,7 +50,7 @@ export default function LayoutClient({ children, session }: LayoutClientProps) {
                   <Link
                     key={item.name}
                     href={item.href}
-                    className="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-colors"
+                    className="border-transparent text-gray-900 hover:text-gray-700 hover:border-gray-300 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-colors"
                   >
                     {item.name}
                   </Link>
@@ -65,7 +65,7 @@ export default function LayoutClient({ children, session }: LayoutClientProps) {
                       <p className="text-sm font-medium text-gray-900">
                         {session.name || session.email}
                       </p>
-                      <p className="text-xs text-gray-500 capitalize">
+                      <p className="text-xs text-gray-900 capitalize">
                         {session.role}
                       </p>
                     </div>

@@ -77,7 +77,7 @@ function LoginContent() {
             <h1 className="text-3xl font-bold text-gray-900 mb-2">
               PrecoTracks CRM
             </h1>
-            <p className="text-gray-600">
+            <p className="text-gray-900">
               Ingresa tu email para recibir un enlace de acceso
             </p>
           </div>
@@ -123,7 +123,7 @@ function LoginContent() {
             </button>
           </form>
 
-          <div className="mt-6 text-center text-sm text-gray-500">
+          <div className="mt-6 text-center text-sm text-gray-900">
             <p>
               El enlace expira en 30 minutos y solo puede usarse una vez.
             </p>
@@ -142,7 +142,7 @@ export default function LoginPage() {
           <div className="bg-white rounded-xl shadow-lg p-8">
             <div className="text-center">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-              <p className="text-gray-600">Cargando...</p>
+              <p className="text-gray-900">Cargando...</p>
             </div>
           </div>
         </div>

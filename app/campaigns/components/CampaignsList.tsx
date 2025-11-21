@@ -57,28 +57,28 @@ export default function CampaignsList() {
   return (
     <div className="bg-white rounded-lg shadow overflow-hidden">
       {loading ? (
-        <div className="p-8 text-center text-gray-500">Cargando...</div>
+        <div className="p-8 text-center text-gray-900">Cargando...</div>
       ) : campaigns.length === 0 ? (
-        <div className="p-8 text-center text-gray-500">
+        <div className="p-8 text-center text-gray-900">
           No hay campañas. <Link href="/campaigns/new" className="text-blue-600">Crea una</Link>
         </div>
       ) : (
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-900 uppercase">
                 Nombre
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-900 uppercase">
                 Subject
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-900 uppercase">
                 Estado
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-900 uppercase">
                 Creada
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-900 uppercase">
                 Acciones
               </th>
             </tr>
@@ -89,7 +89,7 @@ export default function CampaignsList() {
                 <td className="px-6 py-4 whitespace-nowrap font-medium text-gray-900">
                   {campaign.name}
                 </td>
-                <td className="px-6 py-4 text-sm text-gray-500">
+                <td className="px-6 py-4 text-sm text-gray-900">
                   {campaign.subject}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
@@ -101,7 +101,7 @@ export default function CampaignsList() {
                     {getStatusLabel(campaign.status)}
                   </span>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                   {new Date(campaign.createdAt).toLocaleDateString('es-ES')}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm">

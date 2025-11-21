@@ -83,7 +83,7 @@ export default function ParticipantsList() {
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
         {search && (
           <div className="mb-4 flex items-center justify-between">
-            <div className="flex items-center gap-2 text-sm text-gray-600">
+            <div className="flex items-center gap-2 text-sm text-gray-900">
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
@@ -96,7 +96,7 @@ export default function ParticipantsList() {
         <div className="flex flex-col md:flex-row gap-4">
           <div className="flex-1 relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="h-5 w-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
             </div>
@@ -116,7 +116,7 @@ export default function ParticipantsList() {
                 }}
                 className="absolute inset-y-0 right-0 pr-3 flex items-center"
               >
-                <svg className="h-5 w-5 text-gray-400 hover:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="h-5 w-5 text-gray-700 hover:text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
@@ -138,17 +138,17 @@ export default function ParticipantsList() {
         {loading ? (
           <div className="p-8 text-center">
             <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mb-2"></div>
-            <p className="text-gray-600">Buscando participantes...</p>
+            <p className="text-gray-900">Buscando participantes...</p>
           </div>
         ) : participants.length === 0 ? (
           <div className="p-8 text-center">
             {search ? (
               <div>
-                <svg className="mx-auto h-12 w-12 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="mx-auto h-12 w-12 text-gray-700 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 <p className="text-gray-900 font-medium mb-1">No se encontraron resultados</p>
-                <p className="text-sm text-gray-600 mb-4">
+                <p className="text-sm text-gray-900 mb-4">
                   No hay participantes que coincidan con "{search}"
                 </p>
                 <button
@@ -164,7 +164,7 @@ export default function ParticipantsList() {
             ) : (
               <div>
                 <p className="text-gray-900 font-medium mb-1">No hay participantes</p>
-                <p className="text-sm text-gray-600 mb-4">
+                <p className="text-sm text-gray-900 mb-4">
                   Comienza importando participantes desde un archivo CSV
                 </p>
                 <Link href="/participants/import" className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium">
@@ -179,7 +179,7 @@ export default function ParticipantsList() {
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-900 uppercase">
                       <input
                         type="checkbox"
                         checked={selectedIds.size === participants.length}
@@ -228,10 +228,10 @@ export default function ParticipantsList() {
                         <div className="text-sm text-gray-900">{participant.email}</div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">{participant.phone || <span className="text-gray-400">—</span>}</div>
+                        <div className="text-sm text-gray-900">{participant.phone || <span className="text-gray-700">—</span>}</div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">{participant.city || <span className="text-gray-400">—</span>}</div>
+                        <div className="text-sm text-gray-900">{participant.city || <span className="text-gray-700">—</span>}</div>
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex flex-wrap gap-1">

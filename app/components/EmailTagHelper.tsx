@@ -67,7 +67,7 @@ export default function EmailTagHelper({ onInsertTag, className = '' }: EmailTag
               <h3 className="text-sm font-semibold text-gray-900">
                 Tags Dinámicos Disponibles
               </h3>
-              <p className="text-xs text-gray-600 mt-1">
+              <p className="text-xs text-gray-900 mt-1">
                 Haz clic en un tag para insertarlo
               </p>
             </div>
@@ -87,7 +87,7 @@ export default function EmailTagHelper({ onInsertTag, className = '' }: EmailTag
                       <p className="text-sm font-medium text-gray-900 group-hover:text-blue-700">
                         {emailTag.label}
                       </p>
-                      <p className="text-xs text-gray-500 mt-0.5">
+                      <p className="text-xs text-gray-900 mt-0.5">
                         {emailTag.description}
                       </p>
                     </div>

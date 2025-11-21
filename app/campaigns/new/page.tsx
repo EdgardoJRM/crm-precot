@@ -187,7 +187,7 @@ function NewCampaignContent() {
             <button
               type="button"
               onClick={() => router.back()}
-              className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+              className="p-2 text-gray-900 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
               title="Volver"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -196,7 +196,7 @@ function NewCampaignContent() {
             </button>
             <div>
               <h1 className="text-3xl font-bold text-gray-900">Nueva Campaña de Email</h1>
-              <p className="mt-2 text-sm text-gray-600">
+              <p className="mt-2 text-sm text-gray-900">
                 Crea y envía campañas personalizadas usando tags dinámicos
               </p>
             </div>
@@ -250,7 +250,7 @@ function NewCampaignContent() {
                     className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 bg-white"
                     placeholder="Ej: Hola {{primerNombre}}, invitación al próximo evento"
                   />
-                  <p className="mt-1.5 text-xs text-gray-600">
+                  <p className="mt-1.5 text-xs text-gray-900">
                     Usa tags dinámicos como <code className="px-1.5 py-0.5 bg-gray-100 rounded text-gray-800">{'{{primerNombre}}'}</code> para personalizar
                   </p>
                 </div>
@@ -265,7 +265,7 @@ function NewCampaignContent() {
                 <h2 className="text-lg font-semibold text-gray-900">
                   Contenido del Email <span className="text-red-500">*</span>
                 </h2>
-                <p className="mt-1 text-sm text-gray-600">
+                <p className="mt-1 text-sm text-gray-900">
                   Escribe el contenido HTML de tu email. Usa el botón "Insertar Tag" para agregar información personalizada.
                 </p>
               </div>
@@ -313,7 +313,7 @@ function NewCampaignContent() {
                 />
                 <div>
                   <div className="font-medium text-gray-900">Todos los participantes</div>
-                  <div className="text-sm text-gray-600 mt-1">
+                  <div className="text-sm text-gray-900 mt-1">
                     Enviar a todos los participantes en la base de datos
                   </div>
                 </div>
@@ -330,7 +330,7 @@ function NewCampaignContent() {
                 />
                 <div className="flex-1">
                   <div className="font-medium text-gray-900">Por tags</div>
-                  <div className="text-sm text-gray-600 mt-1 mb-3">
+                  <div className="text-sm text-gray-900 mt-1 mb-3">
                     Enviar solo a participantes con ciertos tags
                   </div>
                   {recipientType === 'tags' && (
@@ -347,7 +347,7 @@ function NewCampaignContent() {
                       />
                       {availableTags.length > 0 && (
                         <div className="mt-2">
-                          <p className="text-xs text-gray-600 mb-1">Tags disponibles:</p>
+                          <p className="text-xs text-gray-900 mb-1">Tags disponibles:</p>
                           <div className="flex flex-wrap gap-1">
                             {availableTags.map((tag) => (
                               <button
@@ -382,7 +382,7 @@ function NewCampaignContent() {
                 />
                 <div className="flex-1">
                   <div className="font-medium text-gray-900">Participantes específicos</div>
-                  <div className="text-sm text-gray-600 mt-1 mb-3">
+                  <div className="text-sm text-gray-900 mt-1 mb-3">
                     Enviar solo a participantes seleccionados manualmente
                   </div>
                   {recipientType === 'ids' && (
@@ -398,7 +398,7 @@ function NewCampaignContent() {
                         }
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900"
                       />
-                      <p className="mt-2 text-sm text-gray-600">
+                      <p className="mt-2 text-sm text-gray-900">
                         <strong>{selectedIds.length}</strong> participantes seleccionados
                       </p>
                     </div>
@@ -445,7 +445,7 @@ export default function NewCampaignPage() {
       <LayoutClient>
         <div className="text-center py-12">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Cargando...</p>
+          <p className="text-gray-900">Cargando...</p>
         </div>
       </LayoutClient>
     }>
