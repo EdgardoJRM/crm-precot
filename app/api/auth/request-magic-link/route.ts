@@ -23,7 +23,34 @@ export async function POST(request: NextRequest) {
     const normalizedEmail = email.toLowerCase().trim();
 
     // Check if user exists and is active
-    const user = await getUserByEmail(normalizedEmail);
+    let user;
+    try {
+      user = await getUserByEmail(normalizedEmail);
+    } catch (dbError: any) {
+      console.error('Error accessing DynamoDB:', dbError);
+      console.error('Error details:', {
+        message: dbError.message,
+        name: dbError.name,
+        code: dbError.code,
+        region: config.aws.region,
+        table: config.dynamodb.usersTable,
+      });
+      
+      // Check if it's a permissions/credentials error
+      if (dbError.name === 'UnrecognizedClientException' || 
+          dbError.name === 'AccessDeniedException' ||
+          dbError.code === 'CredentialsError') {
+        return NextResponse.json(
+          { 
+            success: false, 
+            error: 'Error de configuración AWS. Verifica permisos IAM y credenciales.' 
+          },
+          { status: 500 }
+        );
+      }
+      
+      throw dbError; // Re-throw to be caught by outer catch
+    }
 
     if (!user || !user.isActive) {
       // Don't reveal if user exists or not (security best practice)
@@ -34,7 +61,16 @@ export async function POST(request: NextRequest) {
     }
 
     // Create magic link session
-    const { token, expiresAt } = await createMagicLinkSession(normalizedEmail);
+    let token: string;
+    let expiresAt: string;
+    try {
+      const sessionData = await createMagicLinkSession(normalizedEmail);
+      token = sessionData.token;
+      expiresAt = sessionData.expiresAt;
+    } catch (dbError: any) {
+      console.error('Error creating magic link session:', dbError);
+      throw dbError;
+    }
 
     // Build magic link URL
     const magicLink = `${config.app.url}/auth/verify?token=${token}`;
@@ -42,9 +78,17 @@ export async function POST(request: NextRequest) {
     // Send email via SES
     try {
       await sendMagicLinkEmail(normalizedEmail, magicLink);
-    } catch (emailError) {
+    } catch (emailError: any) {
       console.error('Error sending magic link email:', emailError);
+      console.error('SES Error details:', {
+        message: emailError.message,
+        name: emailError.name,
+        code: emailError.code,
+        fromEmail: config.ses.fromEmail,
+      });
+      
       // Still return success to not reveal if email was sent
+      // But log the error for debugging
       return NextResponse.json(
         { success: true },
         { status: 200 }
@@ -54,8 +98,22 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ success: true });
   } catch (error: any) {
     console.error('Error in request-magic-link:', error);
+    console.error('Full error details:', {
+      message: error.message,
+      name: error.name,
+      code: error.code,
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined,
+    });
+    
+    // Return more detailed error in development, generic in production
+    const isDevelopment = process.env.NODE_ENV === 'development';
     return NextResponse.json(
-      { success: false, error: 'Error interno del servidor' },
+      { 
+        success: false, 
+        error: isDevelopment 
+          ? `Error: ${error.message || 'Error interno del servidor'} (${error.name || 'Unknown'})` 
+          : 'Error interno del servidor. Verifica la configuración de AWS.' 
+      },
       { status: 500 }
     );
   }
