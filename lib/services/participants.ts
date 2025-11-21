@@ -112,10 +112,14 @@ export async function listParticipants(
   };
 
   if (options.search) {
+    const searchLower = options.search.toLowerCase().trim();
+    // Search in multiple fields: email, firstName, lastName, city, phone
+    // Note: DynamoDB contains() is case-sensitive, so we search both original and lowercase versions
+    // For better results, we'll do a scan and filter in memory for search
     filterExpressions.push(
-      '(contains(email, :search) OR contains(firstName, :search) OR contains(lastName, :search) OR contains(city, :search))'
+      '(contains(email, :search) OR contains(firstName, :search) OR contains(lastName, :search) OR contains(city, :search) OR contains(phone, :search))'
     );
-    expressionValues[':search'] = options.search.toLowerCase();
+    expressionValues[':search'] = searchLower;
   }
 
   if (options.tag) {
@@ -136,7 +140,29 @@ export async function listParticipants(
 
   const result = await docClient.send(new ScanCommand(scanParams));
 
-  const items = (result.Items || []) as Participant[];
+  let items = (result.Items || []) as Participant[];
+  
+  // If search is provided, do additional filtering for tags and case-insensitive matching
+  if (options.search) {
+    const searchLower = options.search.toLowerCase().trim();
+    items = items.filter((participant) => {
+      // Check all searchable fields case-insensitively
+      const emailMatch = participant.email?.toLowerCase().includes(searchLower);
+      const firstNameMatch = participant.firstName?.toLowerCase().includes(searchLower);
+      const lastNameMatch = participant.lastName?.toLowerCase().includes(searchLower);
+      const fullNameMatch = `${participant.firstName} ${participant.lastName}`.toLowerCase().includes(searchLower);
+      const cityMatch = participant.city?.toLowerCase().includes(searchLower);
+      const phoneMatch = participant.phone?.toLowerCase().includes(searchLower);
+      
+      // Check tags (case-insensitive)
+      const tagMatch = participant.tags?.some(tag => 
+        tag.toLowerCase().includes(searchLower)
+      );
+      
+      return emailMatch || firstNameMatch || lastNameMatch || fullNameMatch || cityMatch || phoneMatch || tagMatch;
+    });
+  }
+
   const hasMore = items.length > limit;
   const participants = hasMore ? items.slice(0, limit) : items;
 

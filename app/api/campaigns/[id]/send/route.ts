@@ -16,6 +16,8 @@ import {
   getParticipantsByIds,
 } from '@/lib/services/participants';
 import { sendCampaignEmail, delay } from '@/lib/aws/ses';
+import { replaceTags, getTagReplacements } from '@/lib/utils/email-tags';
+import { getParticipantById } from '@/lib/services/participants';
 import type { CampaignFilters } from '@/lib/models/types';
 
 export async function POST(
@@ -66,13 +68,30 @@ export async function POST(
     let sentCount = 0;
     let failedCount = 0;
 
-    // Send emails with throttling
+    // Send emails with throttling and tag replacement
     for (const recipient of recipients) {
       try {
+        // Get participant data for tag replacement
+        const participant = await getParticipantById(recipient.id);
+        const tagReplacements = participant 
+          ? getTagReplacements(participant)
+          : {
+              nombre: recipient.email.split('@')[0],
+              primerNombre: recipient.email.split('@')[0],
+              apellido: '',
+              email: recipient.email,
+              telefono: '',
+              ciudad: '',
+            };
+
+        // Replace tags in subject and body
+        const processedSubject = replaceTags(campaign.subject, tagReplacements);
+        const processedBodyHtml = replaceTags(campaign.bodyHtml, tagReplacements);
+
         const result = await sendCampaignEmail(
           recipient.email,
-          campaign.subject,
-          campaign.bodyHtml
+          processedSubject,
+          processedBodyHtml
         );
 
         if (result.success) {

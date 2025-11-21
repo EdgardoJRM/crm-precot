@@ -1,19 +1,23 @@
 /**
- * Create/Edit Campaign Page
- * Allows users to create new email campaigns
+ * Create/Edit Campaign Page - Improved Version
+ * User-friendly email campaign creator with dynamic tags and preview
  */
 
 'use client';
 
-import { useState, useEffect, FormEvent, Suspense } from 'react';
+import { useState, useEffect, FormEvent, Suspense, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import type { CampaignFilters } from '@/lib/models/types';
+import EmailTagHelper from '@/app/components/EmailTagHelper';
+import EmailPreview from '@/app/components/EmailPreview';
+import LayoutClient from '@/app/components/LayoutClient';
 
 function NewCampaignContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [loading, setLoading] = useState(false);
   const [sending, setSending] = useState(false);
+  const [testEmail, setTestEmail] = useState('');
   const [formData, setFormData] = useState({
     name: '',
     subject: '',
@@ -23,6 +27,8 @@ function NewCampaignContent() {
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [availableTags, setAvailableTags] = useState<string[]>([]);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const subjectRef = useRef<HTMLInputElement>(null);
+  const bodyRef = useRef<HTMLTextAreaElement>(null);
 
   // Get participant IDs from URL if coming from participants page
   useEffect(() => {
@@ -40,9 +46,74 @@ function NewCampaignContent() {
   }, []);
 
   const loadTags = async () => {
-    // In a real implementation, fetch unique tags from API
-    // For now, using empty array
-    setAvailableTags([]);
+    try {
+      const response = await fetch('/api/participants');
+      const data = await response.json();
+      if (data.success) {
+        // Extract unique tags from participants
+        const tags = new Set<string>();
+        data.data.items?.forEach((p: any) => {
+          p.tags?.forEach((tag: string) => tags.add(tag));
+        });
+        setAvailableTags(Array.from(tags));
+      }
+    } catch (error) {
+      console.error('Error loading tags:', error);
+    }
+  };
+
+  const insertTag = (tag: string) => {
+    // Insert tag at cursor position in body
+    if (bodyRef.current) {
+      const textarea = bodyRef.current;
+      const start = textarea.selectionStart;
+      const end = textarea.selectionEnd;
+      const text = formData.bodyHtml;
+      const newText = text.substring(0, start) + tag + text.substring(end);
+      setFormData({ ...formData, bodyHtml: newText });
+      // Restore cursor position
+      setTimeout(() => {
+        textarea.focus();
+        textarea.setSelectionRange(start + tag.length, start + tag.length);
+      }, 0);
+    } else {
+      // Fallback: append to end
+      setFormData({ ...formData, bodyHtml: formData.bodyHtml + tag });
+    }
+  };
+
+  const insertTagInSubject = (tag: string) => {
+    if (subjectRef.current) {
+      const input = subjectRef.current;
+      const start = input.selectionStart || 0;
+      const end = input.selectionEnd || 0;
+      const text = formData.subject;
+      const newText = text.substring(0, start) + tag + text.substring(end);
+      setFormData({ ...formData, subject: newText });
+      setTimeout(() => {
+        input.focus();
+        input.setSelectionRange(start + tag.length, start + tag.length);
+      }, 0);
+    } else {
+      setFormData({ ...formData, subject: formData.subject + tag });
+    }
+  };
+
+  const handleSendTest = async (email: string) => {
+    const response = await fetch('/api/campaigns/test-email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email,
+        subject: formData.subject,
+        bodyHtml: formData.bodyHtml,
+      }),
+    });
+
+    const data = await response.json();
+    if (!data.success) {
+      throw new Error(data.error || 'Error al enviar email de prueba');
+    }
   };
 
   const handleSubmit = async (e: FormEvent, sendNow: boolean = false) => {
@@ -87,20 +158,20 @@ function NewCampaignContent() {
           const sendData = await sendResponse.json();
 
           if (sendData.success) {
-            alert(`Campaña enviada: ${sendData.data.sentCount} emails enviados`);
+            alert(`✅ Campaña enviada: ${sendData.data.sentCount} emails enviados`);
             router.push('/campaigns');
           } else {
-            alert('Error al enviar campaña: ' + sendData.error);
+            alert('❌ Error al enviar campaña: ' + sendData.error);
           }
         } else {
-          alert('Campaña guardada como borrador');
+          alert('✅ Campaña guardada como borrador');
           router.push('/campaigns');
         }
       } else {
-        alert('Error: ' + data.error);
+        alert('❌ Error: ' + data.error);
       }
     } catch (error) {
-      alert('Error de conexión');
+      alert('❌ Error de conexión');
     } finally {
       setLoading(false);
       setSending(false);
@@ -108,153 +179,248 @@ function NewCampaignContent() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <h1 className="text-2xl font-bold text-gray-900">Nueva Campaña</h1>
+    <LayoutClient>
+      <div className="space-y-6">
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <button
+              type="button"
+              onClick={() => router.back()}
+              className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+              title="Volver"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+              </svg>
+            </button>
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900">Nueva Campaña de Email</h1>
+              <p className="mt-2 text-sm text-gray-600">
+                Crea y envía campañas personalizadas usando tags dinámicos
+              </p>
+            </div>
+          </div>
+          <div className="flex gap-3">
+            <EmailPreview
+              subject={formData.subject}
+              bodyHtml={formData.bodyHtml}
+              testEmail={testEmail}
+              onSendTest={handleSendTest}
+            />
+          </div>
         </div>
-      </header>
 
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <form onSubmit={(e) => handleSubmit(e, false)} className="space-y-6">
           {/* Campaign Details */}
-          <div className="bg-white rounded-lg shadow p-6 space-y-4">
-            <h2 className="text-lg font-semibold">Detalles de la Campaña</h2>
-            
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 space-y-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Nombre de la Campaña *
-              </label>
-              <input
-                type="text"
-                required
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                placeholder="Ej: Campaña Enero 2025"
-              />
+              <h2 className="text-lg font-semibold text-gray-900 mb-4">
+                Información de la Campaña
+              </h2>
+              
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-900 mb-2">
+                    Nombre de la Campaña <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 bg-white"
+                    placeholder="Ej: Campaña Enero 2025"
+                  />
+                </div>
+
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="block text-sm font-medium text-gray-900">
+                      Asunto del Email <span className="text-red-500">*</span>
+                    </label>
+                    <EmailTagHelper onInsertTag={insertTagInSubject} />
+                  </div>
+                  <input
+                    ref={subjectRef}
+                    type="text"
+                    required
+                    value={formData.subject}
+                    onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
+                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 bg-white"
+                    placeholder="Ej: Hola {{primerNombre}}, invitación al próximo evento"
+                  />
+                  <p className="mt-1.5 text-xs text-gray-600">
+                    Usa tags dinámicos como <code className="px-1.5 py-0.5 bg-gray-100 rounded text-gray-800">{'{{primerNombre}}'}</code> para personalizar
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Email Body Editor */}
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-lg font-semibold text-gray-900">
+                  Contenido del Email <span className="text-red-500">*</span>
+                </h2>
+                <p className="mt-1 text-sm text-gray-600">
+                  Escribe el contenido HTML de tu email. Usa el botón "Insertar Tag" para agregar información personalizada.
+                </p>
+              </div>
+              <EmailTagHelper onInsertTag={insertTag} />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Subject del Email *
-              </label>
-              <input
-                type="text"
-                required
-                value={formData.subject}
-                onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                placeholder="Ej: Invitación al próximo evento"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Cuerpo del Email (HTML) *
-              </label>
               <textarea
+                ref={bodyRef}
                 required
-                rows={12}
+                rows={16}
                 value={formData.bodyHtml}
                 onChange={(e) => setFormData({ ...formData, bodyHtml: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 font-mono text-sm"
-                placeholder="<html><body><h1>Hola</h1><p>Contenido del email...</p></body></html>"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-mono text-sm text-gray-900 bg-white"
+                placeholder={`<html>
+  <body style="font-family: Arial, sans-serif; line-height: 1.6;">
+    <h1>Hola {{primerNombre}},</h1>
+    <p>Gracias por tu interés en nuestros eventos.</p>
+    <p>Tu ciudad: {{ciudad}}</p>
+    <p>Saludos,<br>Equipo PrecoTracks</p>
+  </body>
+</html>`}
               />
-              <p className="mt-1 text-xs text-gray-500">
-                Puedes usar HTML básico para formatear el email
-              </p>
+              <div className="mt-2 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                <p className="text-xs text-blue-900">
+                  <strong>💡 Tip:</strong> Puedes usar HTML básico para formatear. Los tags dinámicos como <code className="px-1.5 py-0.5 bg-blue-100 rounded text-blue-800">{'{{nombre}}'}</code>, <code className="px-1.5 py-0.5 bg-blue-100 rounded text-blue-800">{'{{email}}'}</code>, <code className="px-1.5 py-0.5 bg-blue-100 rounded text-blue-800">{'{{ciudad}}'}</code> se reemplazarán automáticamente con la información de cada participante.
+                </p>
+              </div>
             </div>
           </div>
 
           {/* Recipients Selection */}
-          <div className="bg-white rounded-lg shadow p-6 space-y-4">
-            <h2 className="text-lg font-semibold">Destinatarios</h2>
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 space-y-4">
+            <h2 className="text-lg font-semibold text-gray-900">Destinatarios</h2>
 
-            <div className="space-y-3">
-              <label className="flex items-center">
+            <div className="space-y-4">
+              <label className="flex items-start p-4 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
                 <input
                   type="radio"
                   name="recipientType"
                   value="all"
                   checked={recipientType === 'all'}
                   onChange={(e) => setRecipientType(e.target.value as 'all')}
-                  className="mr-2"
+                  className="mt-0.5 mr-3"
                 />
-                Todos los participantes
+                <div>
+                  <div className="font-medium text-gray-900">Todos los participantes</div>
+                  <div className="text-sm text-gray-600 mt-1">
+                    Enviar a todos los participantes en la base de datos
+                  </div>
+                </div>
               </label>
 
-              <label className="flex items-center">
+              <label className="flex items-start p-4 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
                 <input
                   type="radio"
                   name="recipientType"
                   value="tags"
                   checked={recipientType === 'tags'}
                   onChange={(e) => setRecipientType(e.target.value as 'tags')}
-                  className="mr-2"
+                  className="mt-0.5 mr-3"
                 />
-                Por tags
-              </label>
-              {recipientType === 'tags' && (
-                <div className="ml-6">
-                  <input
-                    type="text"
-                    placeholder="Escribe tags separados por coma"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg"
-                    onChange={(e) =>
-                      setSelectedTags(
-                        e.target.value.split(',').map((t) => t.trim()).filter(Boolean)
-                      )
-                    }
-                  />
+                <div className="flex-1">
+                  <div className="font-medium text-gray-900">Por tags</div>
+                  <div className="text-sm text-gray-600 mt-1 mb-3">
+                    Enviar solo a participantes con ciertos tags
+                  </div>
+                  {recipientType === 'tags' && (
+                    <div>
+                      <input
+                        type="text"
+                        placeholder="Escribe tags separados por coma (ej: vip, newsletter, evento-2025)"
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900"
+                        onChange={(e) =>
+                          setSelectedTags(
+                            e.target.value.split(',').map((t) => t.trim()).filter(Boolean)
+                          )
+                        }
+                      />
+                      {availableTags.length > 0 && (
+                        <div className="mt-2">
+                          <p className="text-xs text-gray-600 mb-1">Tags disponibles:</p>
+                          <div className="flex flex-wrap gap-1">
+                            {availableTags.map((tag) => (
+                              <button
+                                key={tag}
+                                type="button"
+                                onClick={() => {
+                                  if (!selectedTags.includes(tag)) {
+                                    setSelectedTags([...selectedTags, tag]);
+                                  }
+                                }}
+                                className="px-2 py-1 text-xs bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition-colors"
+                              >
+                                {tag}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
-              )}
+              </label>
 
-              <label className="flex items-center">
+              <label className="flex items-start p-4 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
                 <input
                   type="radio"
                   name="recipientType"
                   value="ids"
                   checked={recipientType === 'ids'}
                   onChange={(e) => setRecipientType(e.target.value as 'ids')}
-                  className="mr-2"
+                  className="mt-0.5 mr-3"
                 />
-                IDs específicos
-              </label>
-              {recipientType === 'ids' && (
-                <div className="ml-6">
-                  <input
-                    type="text"
-                    placeholder="IDs separados por coma"
-                    value={selectedIds.join(', ')}
-                    onChange={(e) =>
-                      setSelectedIds(
-                        e.target.value.split(',').map((id) => id.trim()).filter(Boolean)
-                      )
-                    }
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg"
-                  />
-                  <p className="mt-1 text-xs text-gray-500">
-                    {selectedIds.length} participantes seleccionados
-                  </p>
+                <div className="flex-1">
+                  <div className="font-medium text-gray-900">Participantes específicos</div>
+                  <div className="text-sm text-gray-600 mt-1 mb-3">
+                    Enviar solo a participantes seleccionados manualmente
+                  </div>
+                  {recipientType === 'ids' && (
+                    <div>
+                      <input
+                        type="text"
+                        placeholder="IDs separados por coma"
+                        value={selectedIds.join(', ')}
+                        onChange={(e) =>
+                          setSelectedIds(
+                            e.target.value.split(',').map((id) => id.trim()).filter(Boolean)
+                          )
+                        }
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900"
+                      />
+                      <p className="mt-2 text-sm text-gray-600">
+                        <strong>{selectedIds.length}</strong> participantes seleccionados
+                      </p>
+                    </div>
+                  )}
                 </div>
-              )}
+              </label>
             </div>
           </div>
 
           {/* Actions */}
-          <div className="flex justify-end gap-4">
+          <div className="flex justify-end gap-3 pt-4 border-t border-gray-200">
             <button
               type="button"
               onClick={() => router.push('/campaigns')}
-              className="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+              className="px-6 py-2.5 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
             >
               Cancelar
             </button>
             <button
               type="submit"
-              disabled={loading}
-              className="px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 disabled:opacity-50"
+              disabled={loading || sending}
+              className="px-6 py-2.5 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               {loading ? 'Guardando...' : 'Guardar como Borrador'}
             </button>
@@ -262,37 +428,28 @@ function NewCampaignContent() {
               type="button"
               onClick={(e) => handleSubmit(e, true)}
               disabled={sending || loading}
-              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+              className="px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm font-medium"
             >
               {sending ? 'Enviando...' : 'Enviar Ahora'}
             </button>
           </div>
         </form>
-      </main>
-    </div>
+      </div>
+    </LayoutClient>
   );
 }
 
 export default function NewCampaignPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-gray-50">
-        <header className="bg-white border-b border-gray-200">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-            <h1 className="text-2xl font-bold text-gray-900">Nueva Campaña</h1>
-          </div>
-        </header>
-        <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-            <p className="text-gray-600">Cargando...</p>
-          </div>
-        </main>
-      </div>
+      <LayoutClient>
+        <div className="text-center py-12">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Cargando...</p>
+        </div>
+      </LayoutClient>
     }>
       <NewCampaignContent />
     </Suspense>
   );
 }
-
-

@@ -13,8 +13,19 @@ export default function ParticipantsList() {
   const [participants, setParticipants] = useState<Participant[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
+  const [searchInput, setSearchInput] = useState('');
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [nextCursor, setNextCursor] = useState<string | undefined>();
+
+  // Debounce search to avoid too many API calls
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setSearch(searchInput);
+      setNextCursor(undefined); // Reset pagination when search changes
+    }, 300); // Wait 300ms after user stops typing
+
+    return () => clearTimeout(timer);
+  }, [searchInput]);
 
   useEffect(() => {
     loadParticipants();
@@ -22,6 +33,7 @@ export default function ParticipantsList() {
 
   const loadParticipants = async (cursor?: string) => {
     try {
+      setLoading(true);
       const params = new URLSearchParams();
       if (search) params.set('search', search);
       if (cursor) params.set('cursor', cursor);
@@ -36,9 +48,13 @@ export default function ParticipantsList() {
           setParticipants(data.data.items);
         }
         setNextCursor(data.data.nextCursor);
+      } else {
+        console.error('Error loading participants:', data.error);
+        setParticipants([]);
       }
     } catch (error) {
       console.error('Error loading participants:', error);
+      setParticipants([]);
     } finally {
       setLoading(false);
     }
@@ -64,19 +80,52 @@ export default function ParticipantsList() {
   return (
     <div className="space-y-6">
       {/* Search and Filters */}
-      <div className="bg-white rounded-lg shadow p-6">
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        {search && (
+          <div className="mb-4 flex items-center justify-between">
+            <div className="flex items-center gap-2 text-sm text-gray-600">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+              <span>
+                {participants.length} resultado{participants.length !== 1 ? 's' : ''} para "{search}"
+              </span>
+            </div>
+          </div>
+        )}
         <div className="flex flex-col md:flex-row gap-4">
-          <input
-            type="text"
-            placeholder="Buscar por email, nombre o ciudad..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-          />
+          <div className="flex-1 relative">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </div>
+            <input
+              type="text"
+              placeholder="Buscar por nombre, email, teléfono, ciudad o tags..."
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+              className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 bg-white"
+            />
+            {searchInput && (
+              <button
+                type="button"
+                onClick={() => {
+                  setSearchInput('');
+                  setSearch('');
+                }}
+                className="absolute inset-y-0 right-0 pr-3 flex items-center"
+              >
+                <svg className="h-5 w-5 text-gray-400 hover:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            )}
+          </div>
           {selectedIds.size > 0 && (
             <button
               onClick={createCampaignWithSelected}
-              className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+              className="px-4 py-2.5 bg-green-600 text-white rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors text-sm font-medium shadow-sm"
             >
               Crear Campaña ({selectedIds.size})
             </button>
@@ -87,10 +136,42 @@ export default function ParticipantsList() {
       {/* Participants Table */}
       <div className="bg-white rounded-lg shadow overflow-hidden">
         {loading ? (
-          <div className="p-8 text-center text-gray-500">Cargando...</div>
+          <div className="p-8 text-center">
+            <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mb-2"></div>
+            <p className="text-gray-600">Buscando participantes...</p>
+          </div>
         ) : participants.length === 0 ? (
-          <div className="p-8 text-center text-gray-500">
-            No hay participantes. <Link href="/participants/import" className="text-blue-600">Importa algunos</Link>
+          <div className="p-8 text-center">
+            {search ? (
+              <div>
+                <svg className="mx-auto h-12 w-12 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <p className="text-gray-900 font-medium mb-1">No se encontraron resultados</p>
+                <p className="text-sm text-gray-600 mb-4">
+                  No hay participantes que coincidan con "{search}"
+                </p>
+                <button
+                  onClick={() => {
+                    setSearchInput('');
+                    setSearch('');
+                  }}
+                  className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+                >
+                  Limpiar búsqueda
+                </button>
+              </div>
+            ) : (
+              <div>
+                <p className="text-gray-900 font-medium mb-1">No hay participantes</p>
+                <p className="text-sm text-gray-600 mb-4">
+                  Comienza importando participantes desde un archivo CSV
+                </p>
+                <Link href="/participants/import" className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium">
+                  Importar CSV
+                </Link>
+              </div>
+            )}
           </div>
         ) : (
           <>
@@ -111,19 +192,19 @@ export default function ParticipantsList() {
                         }}
                       />
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
                       Nombre
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
                       Email
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
                       Teléfono
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
                       Ciudad
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
                       Tags
                     </th>
                   </tr>
@@ -139,23 +220,25 @@ export default function ParticipantsList() {
                         />
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        {participant.firstName} {participant.lastName}
+                        <div className="text-sm font-medium text-gray-900">
+                          {participant.firstName} {participant.lastName}
+                        </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {participant.email}
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-900">{participant.email}</div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {participant.phone || '—'}
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-900">{participant.phone || <span className="text-gray-400">—</span>}</div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {participant.city || '—'}
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-900">{participant.city || <span className="text-gray-400">—</span>}</div>
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex flex-wrap gap-1">
                           {participant.tags.map((tag) => (
                             <span
                               key={tag}
-                              className="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded"
+                              className="px-2 py-1 text-xs bg-blue-100 text-blue-900 rounded font-medium"
                             >
                               {tag}
                             </span>
@@ -171,7 +254,7 @@ export default function ParticipantsList() {
               <div className="p-4 border-t border-gray-200 text-center">
                 <button
                   onClick={() => loadParticipants(nextCursor)}
-                  className="px-4 py-2 text-sm text-blue-600 hover:text-blue-800"
+                  className="px-4 py-2 text-sm font-medium text-blue-600 hover:text-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 rounded-lg transition-colors"
                 >
                   Cargar más
                 </button>
