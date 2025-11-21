@@ -5,7 +5,9 @@
 
 export const config = {
   aws: {
-    region: process.env.REGION || process.env.AWS_REGION || 'us-east-1',
+    // AWS SDK detecta automáticamente la región, pero especificamos us-east-1 por defecto
+    // Solo necesitas REGION si tus recursos están en otra región
+    region: process.env.REGION || 'us-east-1',
   },
   dynamodb: {
     usersTable: process.env.CRM_USERS_TABLE || 'CRM-Users',

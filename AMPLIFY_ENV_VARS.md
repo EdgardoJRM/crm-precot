@@ -4,10 +4,10 @@ Copia estas variables en **AWS Amplify Console > App settings > Environment vari
 
 ## Variables Requeridas
 
-**⚠️ IMPORTANTE:** AWS Amplify no permite variables que empiecen con `AWS_`. Usa `REGION` en lugar de `AWS_REGION`.
+**Nota:** `REGION` es opcional si tus recursos están en `us-east-1` (default). Solo configúrala si usas otra región.
 
 ```
-REGION=us-east-1
+# REGION=us-east-1  # Opcional, solo si necesitas otra región
 CRM_USERS_TABLE=CRM-Users
 CRM_PARTICIPANTS_TABLE=CRM-Participants
 CRM_CAMPAIGNS_TABLE=CRM-Campaigns

@@ -8,6 +8,8 @@ import { DynamoDBDocumentClient } from '@aws-sdk/lib-dynamodb';
 import { config } from '../config';
 
 // Create DynamoDB client
+// Si no especificas región, AWS SDK la detecta automáticamente
+// Pero la especificamos explícitamente para asegurar consistencia
 const client = new DynamoDBClient({
   region: config.aws.region,
 });

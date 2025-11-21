@@ -28,8 +28,9 @@ cp .env.local.example .env.local
 
 ```bash
 # AWS Configuration
-# Note: AWS Amplify doesn't allow variables starting with AWS_
-REGION=us-east-1
+# REGION es opcional - por defecto usa us-east-1
+# Solo configúrala si tus recursos están en otra región
+# REGION=us-east-1
 
 # DynamoDB Tables (puedes usar los nombres por defecto)
 CRM_USERS_TABLE=CRM-Users
