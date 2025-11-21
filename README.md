@@ -31,7 +31,7 @@ cp env.example .env.local
 ```
 
 Edita `.env.local` y configura:
-- `AWS_REGION`: Región de AWS (ej: us-east-1)
+- `REGION`: Región de AWS (ej: us-east-1) - **Nota:** Amplify no permite variables que empiecen con `AWS_`
 - `CRM_*_TABLE`: Nombres de las tablas DynamoDB
 - `SES_FROM_EMAIL` y `SES_REPLY_TO`: Emails para SES
 - `SESSION_SECRET`: Genera uno con `openssl rand -base64 32`

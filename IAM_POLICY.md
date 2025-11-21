@@ -59,16 +59,20 @@ El rol de ejecución de AWS Amplify necesita los siguientes permisos para que el
 3. Agrega una política inline con el JSON de arriba
 4. Asegúrate de que Amplify use este rol
 
-### Opción 3: Usar Variables de Entorno con Credenciales (No Recomendado)
+### Opción 3: Usar Variables de Entorno con Credenciales (No Recomendado y No Funciona en Amplify)
 
-Si no puedes usar IAM Roles, puedes configurar credenciales en variables de entorno:
+**⚠️ IMPORTANTE:** AWS Amplify NO permite variables de entorno que empiecen con `AWS_`. Esta opción NO funcionará en Amplify.
 
+Si estás en desarrollo local, puedes usar:
 ```
 AWS_ACCESS_KEY_ID=tu-access-key
 AWS_SECRET_ACCESS_KEY=tu-secret-key
 ```
 
-**⚠️ Advertencia:** Esta opción es menos segura. Prefiere usar IAM Roles.
+**⚠️ Advertencia:** 
+- Esta opción es menos segura
+- NO funciona en AWS Amplify (usa IAM Roles)
+- Solo para desarrollo local
 
 ## Verificar Permisos
 

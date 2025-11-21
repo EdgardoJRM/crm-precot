@@ -28,7 +28,8 @@ cp .env.local.example .env.local
 
 ```bash
 # AWS Configuration
-AWS_REGION=us-east-1
+# Note: AWS Amplify doesn't allow variables starting with AWS_
+REGION=us-east-1
 
 # DynamoDB Tables (puedes usar los nombres por defecto)
 CRM_USERS_TABLE=CRM-Users
@@ -76,9 +77,10 @@ Ingresa:
 
 ### Opción B: Variables de Entorno
 
-Agrega a tu `.env.local`:
+Agrega a tu `.env.local` (solo para desarrollo local):
 
 ```bash
+# Nota: En producción (Amplify) usa IAM Roles, no credenciales en variables
 AWS_ACCESS_KEY_ID=tu-access-key
 AWS_SECRET_ACCESS_KEY=tu-secret-key
 ```
@@ -194,7 +196,7 @@ En la consola de Amplify, ve a:
 **App settings > Environment variables**
 
 Agrega todas las variables de `.env.local`:
-- `AWS_REGION`
+- `REGION` (no uses `AWS_REGION`, Amplify no lo permite)
 - `CRM_USERS_TABLE`
 - `CRM_PARTICIPANTS_TABLE`
 - `CRM_CAMPAIGNS_TABLE`

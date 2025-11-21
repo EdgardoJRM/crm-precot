@@ -8,7 +8,7 @@
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient, PutCommand } from "@aws-sdk/lib-dynamodb";
 
-const client = new DynamoDBClient({ region: process.env.AWS_REGION || "us-east-1" });
+const client = new DynamoDBClient({ region: process.env.REGION || process.env.AWS_REGION || "us-east-1" });
 const docClient = DynamoDBDocumentClient.from(client);
 
 const USERS_TABLE = process.env.CRM_USERS_TABLE || "CRM-Users";

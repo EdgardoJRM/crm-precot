@@ -13,11 +13,11 @@ if ! aws sts get-caller-identity &>/dev/null; then
 fi
 
 AWS_ACCOUNT=$(aws sts get-caller-identity --query Account --output text)
-AWS_REGION=${AWS_REGION:-us-east-1}
+REGION=${REGION:-us-east-1}
 
 echo "📋 Información AWS:"
 echo "   Account: $AWS_ACCOUNT"
-echo "   Region: $AWS_REGION"
+echo "   Region: $REGION"
 echo ""
 
 # Generar SESSION_SECRET
@@ -29,7 +29,7 @@ echo ""
 echo "🗄️  Verificando tablas DynamoDB..."
 TABLES=("CRM-Users" "CRM-Participants" "CRM-Campaigns")
 for table in "${TABLES[@]}"; do
-    if aws dynamodb describe-table --table-name "$table" --region "$AWS_REGION" &>/dev/null; then
+    if aws dynamodb describe-table --table-name "$table" --region "$REGION" &>/dev/null; then
         echo "   ✅ $table existe"
     else
         echo "   ⚠️  $table no existe"
@@ -38,7 +38,7 @@ done
 
 echo ""
 echo "📧 Verificando AWS SES..."
-if aws ses get-account-sending-enabled --region "$AWS_REGION" &>/dev/null; then
+if aws ses get-account-sending-enabled --region "$REGION" &>/dev/null; then
     echo "   ✅ SES habilitado"
 else
     echo "   ⚠️  SES no habilitado"
@@ -47,7 +47,7 @@ fi
 echo ""
 echo "📝 Variables para AWS Amplify:"
 echo ""
-echo "AWS_REGION=$AWS_REGION"
+echo "REGION=$REGION"
 echo "CRM_USERS_TABLE=CRM-Users"
 echo "CRM_PARTICIPANTS_TABLE=CRM-Participants"
 echo "CRM_CAMPAIGNS_TABLE=CRM-Campaigns"
