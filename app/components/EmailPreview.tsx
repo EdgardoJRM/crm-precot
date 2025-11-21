@@ -139,7 +139,7 @@ export default function EmailPreview({
                       <strong className="text-gray-900">De:</strong> <span className="text-gray-900">noreply@precotracks.org</span>
                     </div>
                     <div className="text-sm text-gray-900 mt-1">
-                      <strong className="text-gray-900">Para:</strong> <span className="text-gray-900">{sampleData.email}</span>
+                      <strong className="text-gray-900">Para:</strong> <span className="text-gray-900 font-semibold">{sampleData.email}</span>
                     </div>
                     <div className="text-sm text-gray-900 mt-1">
                       <strong className="text-gray-900">Asunto:</strong> <span className="text-gray-900">{previewSubject || '(sin asunto)'}</span>
