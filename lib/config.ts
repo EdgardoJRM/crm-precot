@@ -19,7 +19,9 @@ export const config = {
     replyTo: process.env.SES_REPLY_TO || 'noreply@precotracks.org',
   },
   app: {
-    url: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
+    // Use NEXT_PUBLIC_APP_URL if available, otherwise try APP_URL, otherwise default
+    // In production, this should be set to the Amplify app URL
+    url: process.env.NEXT_PUBLIC_APP_URL || process.env.APP_URL || 'http://localhost:3000',
   },
   session: {
     secret: process.env.SESSION_SECRET || 'change-me-in-production',

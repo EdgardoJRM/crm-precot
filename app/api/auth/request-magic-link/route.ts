@@ -97,11 +97,26 @@ export async function POST(request: NextRequest) {
     }
 
     // Build magic link URL
-    const magicLink = `${config.app.url}/auth/verify?token=${token}`;
+    // Use explicit URL from config, fallback to request headers if needed
+    let appUrl = config.app.url;
+    if (!appUrl || appUrl.includes('localhost')) {
+      const origin = request.headers.get('origin');
+      const host = request.headers.get('host');
+      if (origin) {
+        appUrl = origin;
+      } else if (host) {
+        appUrl = `https://${host}`;
+      } else {
+        appUrl = 'https://main.d2iig4dsutc1x0.amplifyapp.com'; // Fallback hardcoded para producción
+      }
+    }
+    const magicLink = `${appUrl}/auth/verify?token=${token}`;
     console.log('Sending magic link email:', {
       to: normalizedEmail,
       from: config.ses.fromEmail,
-      link: magicLink.substring(0, 50) + '...',
+      appUrl: appUrl,
+      configUrl: config.app.url,
+      link: magicLink.substring(0, 60) + '...',
     });
 
     // Send email via SES
