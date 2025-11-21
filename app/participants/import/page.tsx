@@ -5,7 +5,7 @@
 
 'use client';
 
-import { useState, FormEvent } from 'react';
+import { useState, useEffect, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import Papa from 'papaparse';
 import type { CSVColumnMapping } from '@/lib/models/types';
@@ -24,6 +24,16 @@ export default function ImportPage() {
     updatedCount: number;
     skippedCount: number;
   } | null>(null);
+
+  // Handle redirect when result is set
+  useEffect(() => {
+    if (result) {
+      const timer = setTimeout(() => {
+        router.push('/participants');
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [result, router]);
 
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
@@ -67,9 +77,7 @@ export default function ImportPage() {
 
       if (data.success) {
         setResult(data.data);
-        setTimeout(() => {
-          router.push('/participants');
-        }, 2000);
+        // Redirect is handled by useEffect
       } else {
         alert(data.error || 'Error al importar');
       }
@@ -209,9 +217,21 @@ export default function ImportPage() {
                 <li><strong>Actualizados:</strong> {result.updatedCount}</li>
                 <li><strong>Omitidos:</strong> {result.skippedCount}</li>
               </ul>
-              <p className="mt-3 text-sm text-green-700">
-                Redirigiendo a la lista de participantes...
-              </p>
+              <div className="mt-4 flex items-center gap-3">
+                <p className="text-sm text-green-700">
+                  Redirigiendo a la lista de participantes...
+                </p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    router.push('/participants');
+                    router.refresh();
+                  }}
+                  className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm font-medium transition-colors"
+                >
+                  Ir Ahora
+                </button>
+              </div>
             </div>
           )}
 
