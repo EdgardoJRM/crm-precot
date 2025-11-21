@@ -19,11 +19,11 @@ function NewSequenceContent() {
     name: '',
     description: '',
   });
-  const [steps, setSteps] = useState<EmailSequenceStep[]>([
+  const [steps, setSteps] = useState<Array<Omit<EmailSequenceStep, 'bodyHtml'> & { bodyText: string }>>([
     {
       stepNumber: 1,
       subject: '',
-      bodyHtml: '',
+      bodyText: '', // Plain text instead of HTML
       delayDays: 0,
       delayHours: 0,
     },
@@ -54,10 +54,10 @@ function NewSequenceContent() {
   };
 
   const addStep = () => {
-    const newStep: EmailSequenceStep = {
+    const newStep = {
       stepNumber: steps.length + 1,
       subject: '',
-      bodyHtml: '',
+      bodyText: '',
       delayDays: 1,
       delayHours: 0,
     };
@@ -77,19 +77,19 @@ function NewSequenceContent() {
     setSteps(newSteps);
   };
 
-  const updateStep = (index: number, field: keyof EmailSequenceStep, value: any) => {
+  const updateStep = (index: number, field: 'subject' | 'bodyText' | 'delayDays' | 'delayHours', value: any) => {
     const newSteps = [...steps];
     newSteps[index] = { ...newSteps[index], [field]: value };
     setSteps(newSteps);
   };
 
-  const insertTagInStep = (stepIndex: number, field: 'subject' | 'bodyHtml', tag: string) => {
+  const insertTagInStep = (stepIndex: number, field: 'subject' | 'bodyText', tag: string) => {
     const newSteps = [...steps];
     const step = newSteps[stepIndex];
     if (field === 'subject') {
       step.subject = (step.subject || '') + tag;
     } else {
-      step.bodyHtml = (step.bodyHtml || '') + tag;
+      step.bodyText = (step.bodyText || '') + tag;
     }
     setSteps(newSteps);
   };
@@ -97,7 +97,7 @@ function NewSequenceContent() {
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
-    if (steps.some((s) => !s.subject || !s.bodyHtml)) {
+    if (steps.some((s) => !s.subject || !s.bodyText)) {
       alert('Todos los pasos deben tener subject y contenido');
       return;
     }
@@ -292,20 +292,22 @@ function NewSequenceContent() {
                       <label className="block text-sm font-medium text-gray-900">
                         Contenido del Email <span className="text-red-500">*</span>
                       </label>
-                      <EmailTagHelper onInsertTag={(tag) => insertTagInStep(index, 'bodyHtml', tag)} />
+                      <EmailTagHelper onInsertTag={(tag) => insertTagInStep(index, 'bodyText', tag)} />
                     </div>
                     <textarea
                       required
                       rows={8}
-                      value={step.bodyHtml}
-                      onChange={(e) => updateStep(index, 'bodyHtml', e.target.value)}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-mono text-sm text-gray-900 bg-white"
-                      placeholder={`<html>
-  <body style="font-family: Arial, sans-serif;">
-    <h1>Hola {{primerNombre}},</h1>
-    <p>Contenido del email...</p>
-  </body>
-</html>`}
+                      value={step.bodyText}
+                      onChange={(e) => updateStep(index, 'bodyText', e.target.value)}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm text-gray-900 bg-white"
+                      placeholder={`Hola {{primerNombre}},
+
+Gracias por tu interés en nuestros eventos.
+
+Tu ciudad: {{ciudad}}
+
+Saludos,
+Equipo PrecoTracks`}
                     />
                   </div>
                 </div>

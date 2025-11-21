@@ -21,7 +21,7 @@ function NewCampaignContent() {
   const [formData, setFormData] = useState({
     name: '',
     subject: '',
-    bodyHtml: '',
+    bodyText: '', // Plain text instead of HTML
   });
   const [recipientType, setRecipientType] = useState<'all' | 'tags' | 'ids'>('all');
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
@@ -68,9 +68,9 @@ function NewCampaignContent() {
       const textarea = bodyRef.current;
       const start = textarea.selectionStart;
       const end = textarea.selectionEnd;
-      const text = formData.bodyHtml;
+      const text = formData.bodyText;
       const newText = text.substring(0, start) + tag + text.substring(end);
-      setFormData({ ...formData, bodyHtml: newText });
+      setFormData({ ...formData, bodyText: newText });
       // Restore cursor position
       setTimeout(() => {
         textarea.focus();
@@ -78,7 +78,7 @@ function NewCampaignContent() {
       }, 0);
     } else {
       // Fallback: append to end
-      setFormData({ ...formData, bodyHtml: formData.bodyHtml + tag });
+      setFormData({ ...formData, bodyText: formData.bodyText + tag });
     }
   };
 
@@ -106,7 +106,7 @@ function NewCampaignContent() {
       body: JSON.stringify({
         email,
         subject: formData.subject,
-        bodyHtml: formData.bodyHtml,
+        bodyText: formData.bodyText, // Send plain text, backend will convert
       }),
     });
 
@@ -141,7 +141,9 @@ function NewCampaignContent() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          ...formData,
+          name: formData.name,
+          subject: formData.subject,
+          bodyText: formData.bodyText, // Send plain text, backend converts to HTML
           filters,
         }),
       });
@@ -204,7 +206,7 @@ function NewCampaignContent() {
           <div className="flex gap-3">
             <EmailPreview
               subject={formData.subject}
-              bodyHtml={formData.bodyHtml}
+              bodyText={formData.bodyText}
               testEmail={testEmail}
               onSendTest={handleSendTest}
             />
@@ -266,7 +268,7 @@ function NewCampaignContent() {
                   Contenido del Email <span className="text-red-500">*</span>
                 </h2>
                 <p className="mt-1 text-sm text-gray-900">
-                  Escribe el contenido HTML de tu email. Usa el botón "Insertar Tag" para agregar información personalizada.
+                  Escribe el contenido de tu email en texto normal. Los saltos de línea se convertirán automáticamente. Usa el botón "Insertar Tag" para agregar información personalizada.
                 </p>
               </div>
               <EmailTagHelper onInsertTag={insertTag} />
@@ -277,21 +279,22 @@ function NewCampaignContent() {
                 ref={bodyRef}
                 required
                 rows={16}
-                value={formData.bodyHtml}
-                onChange={(e) => setFormData({ ...formData, bodyHtml: e.target.value })}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-mono text-sm text-gray-900 bg-white"
-                placeholder={`<html>
-  <body style="font-family: Arial, sans-serif; line-height: 1.6;">
-    <h1>Hola {{primerNombre}},</h1>
-    <p>Gracias por tu interés en nuestros eventos.</p>
-    <p>Tu ciudad: {{ciudad}}</p>
-    <p>Saludos,<br>Equipo PrecoTracks</p>
-  </body>
-</html>`}
+                value={formData.bodyText}
+                onChange={(e) => setFormData({ ...formData, bodyText: e.target.value })}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm text-gray-900 bg-white"
+                placeholder={`Hola {{primerNombre}},
+
+Gracias por tu interés en nuestros eventos.
+
+Tu ciudad: {{ciudad}}
+Tu email: {{email}}
+
+Saludos,
+Equipo PrecoTracks`}
               />
               <div className="mt-2 p-3 bg-blue-50 border border-blue-200 rounded-lg">
                 <p className="text-xs text-blue-900">
-                  <strong>💡 Tip:</strong> Puedes usar HTML básico para formatear. Los tags dinámicos como <code className="px-1.5 py-0.5 bg-blue-100 rounded text-blue-800">{'{{nombre}}'}</code>, <code className="px-1.5 py-0.5 bg-blue-100 rounded text-blue-800">{'{{email}}'}</code>, <code className="px-1.5 py-0.5 bg-blue-100 rounded text-blue-800">{'{{ciudad}}'}</code> se reemplazarán automáticamente con la información de cada participante.
+                  <strong>💡 Tip:</strong> Escribe tu mensaje normalmente. Los saltos de línea se convertirán automáticamente. Usa los tags dinámicos como <code className="px-1.5 py-0.5 bg-blue-100 rounded text-blue-800">{'{{nombre}}'}</code>, <code className="px-1.5 py-0.5 bg-blue-100 rounded text-blue-800">{'{{email}}'}</code>, <code className="px-1.5 py-0.5 bg-blue-100 rounded text-blue-800">{'{{ciudad}}'}</code> para personalizar cada email.
                 </p>
               </div>
             </div>

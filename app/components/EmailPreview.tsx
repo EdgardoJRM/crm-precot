@@ -10,14 +10,16 @@ import { replaceTags, getSampleReplacements } from '@/lib/utils/email-tags';
 
 interface EmailPreviewProps {
   subject: string;
-  bodyHtml: string;
+  bodyText: string; // Plain text instead of HTML
   testEmail?: string;
   onSendTest?: (email: string) => Promise<void>;
 }
 
+import { textToHtml } from '@/lib/utils/text-to-html';
+
 export default function EmailPreview({
   subject,
-  bodyHtml,
+  bodyText,
   testEmail,
   onSendTest,
 }: EmailPreviewProps) {
@@ -25,9 +27,10 @@ export default function EmailPreview({
   const [testEmailInput, setTestEmailInput] = useState(testEmail || '');
   const [sendingTest, setSendingTest] = useState(false);
 
-  // Replace tags with sample data
+  // Replace tags with sample data and convert to HTML
   const sampleData = getSampleReplacements();
-  const previewHtml = replaceTags(bodyHtml, sampleData);
+  const textWithTags = replaceTags(bodyText, sampleData);
+  const previewHtml = textToHtml(textWithTags);
   const previewSubject = replaceTags(subject, sampleData);
 
   const handleSendTest = async () => {
@@ -133,13 +136,13 @@ export default function EmailPreview({
                   {/* Email Header */}
                   <div className="bg-gray-50 px-4 py-3 border-b border-gray-200">
                     <div className="text-sm text-gray-900">
-                      <strong className="text-gray-900">De:</strong> noreply@precotracks.org
+                      <strong className="text-gray-900">De:</strong> <span className="text-gray-900">noreply@precotracks.org</span>
                     </div>
                     <div className="text-sm text-gray-900 mt-1">
-                      <strong className="text-gray-900">Para:</strong> {sampleData.email}
+                      <strong className="text-gray-900">Para:</strong> <span className="text-gray-900">{sampleData.email}</span>
                     </div>
                     <div className="text-sm text-gray-900 mt-1">
-                      <strong className="text-gray-900">Asunto:</strong> {previewSubject || '(sin asunto)'}
+                      <strong className="text-gray-900">Asunto:</strong> <span className="text-gray-900">{previewSubject || '(sin asunto)'}</span>
                     </div>
                   </div>
 
@@ -152,13 +155,13 @@ export default function EmailPreview({
 
                 {/* Sample Data Info */}
                 <div className="mt-4 p-4 bg-gray-50 rounded-lg">
-                  <p className="text-xs font-medium text-gray-700 mb-2">
+                  <p className="text-xs font-medium text-gray-900 mb-2">
                     Datos de ejemplo usados:
                   </p>
                   <div className="grid grid-cols-2 gap-2 text-xs text-gray-900">
                     {Object.entries(sampleData).map(([key, value]) => (
-                      <div key={key}>
-                        <span className="font-medium">{key}:</span> {value}
+                      <div key={key} className="text-gray-900">
+                        <span className="font-medium text-gray-900">{key}:</span> <span className="text-gray-900">{value}</span>
                       </div>
                     ))}
                   </div>

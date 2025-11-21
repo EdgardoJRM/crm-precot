@@ -6,6 +6,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSession } from '@/lib/auth/session';
 import { listCampaigns, createCampaign } from '@/lib/services/campaigns';
+import { textToHtml } from '@/lib/utils/text-to-html';
 import type { CampaignFilters } from '@/lib/models/types';
 
 export async function GET(request: NextRequest) {
@@ -44,19 +45,22 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { name, subject, bodyHtml, filters } = body;
+    const { name, subject, bodyText, bodyHtml, filters } = body;
 
-    if (!name || !subject || !bodyHtml) {
+    if (!name || !subject || (!bodyText && !bodyHtml)) {
       return NextResponse.json(
-        { success: false, error: 'Nombre, subject y bodyHtml son requeridos' },
+        { success: false, error: 'Nombre, subject y contenido son requeridos' },
         { status: 400 }
       );
     }
 
+    // Convert plain text to HTML if bodyText is provided, otherwise use bodyHtml (for backward compatibility)
+    const htmlContent = bodyText ? textToHtml(bodyText) : bodyHtml;
+
     const campaign = await createCampaign({
       name,
       subject,
-      bodyHtml,
+      bodyHtml: htmlContent,
       createdBy: session.email,
       filters: filters as CampaignFilters,
     });
