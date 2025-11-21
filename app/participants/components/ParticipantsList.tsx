@@ -37,6 +37,7 @@ export default function ParticipantsList() {
       const params = new URLSearchParams();
       if (search) params.set('search', search);
       if (cursor) params.set('cursor', cursor);
+      params.set('limit', '50'); // Load 50 at a time
 
       const response = await fetch(`/api/participants?${params}`);
       const data = await response.json();
@@ -250,14 +251,39 @@ export default function ParticipantsList() {
                 </tbody>
               </table>
             </div>
-            {nextCursor && (
-              <div className="p-4 border-t border-gray-200 text-center">
-                <button
-                  onClick={() => loadParticipants(nextCursor)}
-                  className="px-4 py-2 text-sm font-medium text-blue-600 hover:text-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 rounded-lg transition-colors"
-                >
-                  Cargar más
-                </button>
+            {(nextCursor || participants.length > 0) && (
+              <div className="p-6 border-t border-gray-200 bg-gray-50">
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                  <div className="text-sm text-gray-900">
+                    Mostrando <strong>{participants.length}</strong> participante{participants.length !== 1 ? 's' : ''}
+                    {nextCursor && ' de más disponibles'}
+                  </div>
+                  {nextCursor ? (
+                    <button
+                      onClick={() => loadParticipants(nextCursor)}
+                      disabled={loading}
+                      className="px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors text-sm font-medium shadow-sm flex items-center gap-2"
+                    >
+                      {loading ? (
+                        <>
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                          Cargando...
+                        </>
+                      ) : (
+                        <>
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                          </svg>
+                          Cargar más participantes
+                        </>
+                      )}
+                    </button>
+                  ) : (
+                    <div className="text-sm text-gray-900 font-medium">
+                      ✓ Todos los participantes cargados
+                    </div>
+                  )}
+                </div>
               </div>
             )}
           </>

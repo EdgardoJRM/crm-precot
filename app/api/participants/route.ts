@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
     const searchParams = request.nextUrl.searchParams;
     const search = searchParams.get('search') || undefined;
     const tag = searchParams.get('tag') || undefined;
-    const limit = parseInt(searchParams.get('limit') || '25', 10);
+    const limit = parseInt(searchParams.get('limit') || '50', 10);
     const cursor = searchParams.get('cursor') || undefined;
 
     const result = await listParticipants({
