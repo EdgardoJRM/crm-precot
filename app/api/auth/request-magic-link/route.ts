@@ -64,6 +64,14 @@ export async function POST(request: NextRequest) {
     }
 
     if (!user || !user.isActive) {
+      // Log for debugging (only in production)
+      if (process.env.NODE_ENV === 'production') {
+        console.log('User check:', {
+          userExists: !!user,
+          isActive: user?.isActive,
+          email: normalizedEmail,
+        });
+      }
       // Don't reveal if user exists or not (security best practice)
       return NextResponse.json(
         { success: true }, // Return success even if user doesn't exist
@@ -78,6 +86,11 @@ export async function POST(request: NextRequest) {
       const sessionData = await createMagicLinkSession(normalizedEmail);
       token = sessionData.token;
       expiresAt = sessionData.expiresAt;
+      console.log('Magic link session created:', {
+        email: normalizedEmail,
+        token: token.substring(0, 8) + '...',
+        expiresAt,
+      });
     } catch (dbError: any) {
       console.error('Error creating magic link session:', dbError);
       throw dbError;
@@ -85,10 +98,19 @@ export async function POST(request: NextRequest) {
 
     // Build magic link URL
     const magicLink = `${config.app.url}/auth/verify?token=${token}`;
+    console.log('Sending magic link email:', {
+      to: normalizedEmail,
+      from: config.ses.fromEmail,
+      link: magicLink.substring(0, 50) + '...',
+    });
 
     // Send email via SES
     try {
       await sendMagicLinkEmail(normalizedEmail, magicLink);
+      console.log('Magic link email sent successfully:', {
+        to: normalizedEmail,
+        from: config.ses.fromEmail,
+      });
     } catch (emailError: any) {
       console.error('Error sending magic link email:', emailError);
       console.error('SES Error details:', {
@@ -96,6 +118,7 @@ export async function POST(request: NextRequest) {
         name: emailError.name,
         code: emailError.code,
         fromEmail: config.ses.fromEmail,
+        toEmail: normalizedEmail,
       });
       
       // Still return success to not reveal if email was sent
