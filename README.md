@@ -20,22 +20,32 @@ Sistema CRM interno para gestión de participantes y campañas de email.
 
 ## Configuración
 
+> 📖 **Para una guía completa de setup, consulta [SETUP.md](./SETUP.md)**
+
 ### 1. Variables de Entorno
 
-Copia `.env.local.example` a `.env.local` y configura:
+Copia `env.example` a `.env.local` y configura las variables necesarias:
 
 ```bash
-AWS_REGION=us-east-1
-CRM_USERS_TABLE=CRM-Users
-CRM_PARTICIPANTS_TABLE=CRM-Participants
-CRM_CAMPAIGNS_TABLE=CRM-Campaigns
-SES_FROM_EMAIL=noreply@precotracks.org
-SES_REPLY_TO=noreply@precotracks.org
-NEXT_PUBLIC_APP_URL=https://crm.precotracks.org
-SESSION_SECRET=tu-secret-key-aqui
+cp env.example .env.local
 ```
 
+Edita `.env.local` y configura:
+- `AWS_REGION`: Región de AWS (ej: us-east-1)
+- `CRM_*_TABLE`: Nombres de las tablas DynamoDB
+- `SES_FROM_EMAIL` y `SES_REPLY_TO`: Emails para SES
+- `SESSION_SECRET`: Genera uno con `openssl rand -base64 32`
+- `NEXT_PUBLIC_APP_URL`: URL de la aplicación
+
 ### 2. Crear Tablas DynamoDB
+
+**Opción A: Script automático (Recomendado)**
+
+```bash
+node scripts/create-tables.mjs
+```
+
+**Opción B: Manualmente**
 
 Crea las siguientes tablas en DynamoDB:
 
@@ -51,9 +61,15 @@ Crea las siguientes tablas en DynamoDB:
 - Partition Key: `pk` (String)
 - Sort Key: `sk` (String)
 
-### 3. Configurar Usuarios Whitelist
+### 3. Crear Usuario Inicial
 
-Agrega usuarios autorizados a la tabla `CRM-Users`:
+Crea al menos un usuario en la whitelist:
+
+```bash
+node scripts/init-user.mjs admin@precotracks.org "Admin User" admin
+```
+
+O manualmente, agrega usuarios a la tabla `CRM-Users`:
 
 ```json
 {
