@@ -97,19 +97,26 @@ export async function POST(request: NextRequest) {
     }
 
     // Build magic link URL
-    // Use explicit URL from config, fallback to request headers if needed
-    let appUrl = config.app.url;
-    if (!appUrl || appUrl.includes('localhost')) {
+    // Priority: 1. NEXT_PUBLIC_APP_URL env var, 2. config.app.url, 3. request headers, 4. fallback
+    let appUrl = process.env.NEXT_PUBLIC_APP_URL || config.app.url;
+    
+    // Never use localhost in production
+    if (!appUrl || appUrl.includes('localhost') || appUrl.includes('127.0.0.1')) {
       const origin = request.headers.get('origin');
       const host = request.headers.get('host');
-      if (origin) {
+      
+      if (origin && !origin.includes('localhost') && !origin.includes('127.0.0.1')) {
         appUrl = origin;
-      } else if (host) {
+      } else if (host && !host.includes('localhost') && !host.includes('127.0.0.1')) {
         appUrl = `https://${host}`;
       } else {
-        appUrl = 'https://main.d2iig4dsutc1x0.amplifyapp.com'; // Fallback hardcoded para producción
+        // Production fallback - use custom domain if available, otherwise default Amplify domain
+        appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://crm.precotracks.org';
       }
     }
+    
+    // Ensure URL doesn't have trailing slash
+    appUrl = appUrl.replace(/\/$/, '');
     const magicLink = `${appUrl}/auth/verify?token=${token}`;
     console.log('Sending magic link email:', {
       to: normalizedEmail,
