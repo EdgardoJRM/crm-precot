@@ -1,6 +1,6 @@
 /**
  * API Route: POST /api/auth/logout
- * Logs out user by deleting session cookie
+ * Logs out user by deleting session cookie and redirects to login
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -10,13 +10,14 @@ export async function POST(request: NextRequest) {
   try {
     await deleteSessionCookie();
 
-    return NextResponse.json({ success: true });
+    // Redirect to login page instead of returning JSON
+    const loginUrl = new URL('/login', request.url);
+    return NextResponse.redirect(loginUrl);
   } catch (error: any) {
     console.error('Error in logout:', error);
-    return NextResponse.json(
-      { success: false, error: 'Error al cerrar sesión' },
-      { status: 500 }
-    );
+    // Even on error, redirect to login
+    const loginUrl = new URL('/login', request.url);
+    return NextResponse.redirect(loginUrl);
   }
 }
 

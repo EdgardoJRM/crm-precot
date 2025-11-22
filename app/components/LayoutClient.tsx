@@ -31,8 +31,15 @@ export default function LayoutClient({ children, session }: LayoutClientProps) {
   ];
 
   const handleLogout = async () => {
-    await fetch('/api/auth/logout', { method: 'POST' });
-    router.push('/login');
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' });
+      // Redirect will happen server-side, but ensure client-side redirect as fallback
+      router.push('/login');
+      router.refresh();
+    } catch (error) {
+      // Fallback: redirect anyway
+      router.push('/login');
+    }
   };
 
   return (
